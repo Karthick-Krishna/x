@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="description" content="SecureVault - Secure File Protection" />
+  <title>SecureVault</title>
+
+</head>
+
+<body>
+  <div id="app">
+    <!-- App Header -->
+    <header class="header">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="logo-svg">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" class="lock-shackle"></path>
+          </svg>
+          <div class="logo-pulse"></div>
+        </div>
+        <div class="logo-text">
+          <h1>SecureVault</h1>
+          <span class="logo-tagline">by coralgenz</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="header-btn-wrapper">
+          <button id="help-btn" class="btn-icon" title="Help & Guide">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+          </button>
+          <span class="btn-label">help</span>
+        </div>
+        <div class="header-btn-wrapper">
+          <button id="settings-btn" class="btn-icon" title="Settings">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" class="settings-icon">
+              <circle cx="12" cy="12" r="3" />
+              <path
+                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+            </svg>
+          </button>
+          <span class="btn-label">settings</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Floating Add Button -->
+    <button id="add-file-btn" class="fab" aria-label="Add File">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+      <div class="fab-ripple"></div>
+    </button>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <input type="text" id="search-input" placeholder="🔍 Search files..." class="search-input" />
+      <select id="sort-select" class="sort-select">
+        <option value="date-desc">Newest First</option>
+        <option value="date-asc">Oldest First</option>
+        <option value="name-asc">Name A-Z</option>
+        <option value="name-desc">Name Z-A</option>
+        <option value="size-desc">Largest First</option>
+        <option value="size-asc">Smallest First</option>
+      </select>
+    </div>
+
+    <!-- Quick Tips (shown when no files) -->
+    <div id="quick-tips" class="quick-tips hidden">
+      <h4>🚀 Quick Start</h4>
+      <div class="tips-grid">
+        <div class="tip-card">
+          <div class="tip-icon">➕</div>
+          <span>Tap + to add files</span>
+        </div>
+        <div class="tip-card">
+          <div class="tip-icon">🔐</div>
+          <span>Files are encrypted</span>
+        </div>
+        <div class="tip-card">
+          <div class="tip-icon">📤</div>
+          <span>Share securely</span>
+        </div>
+        <div class="tip-card">
+          <div class="tip-icon">⏱️</div>
+          <span>Set auto-delete</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Security Status Banner -->
+    <div class="security-banner">
+      <div class="security-status">
+        <div class="security-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            <polyline points="9 12 11 14 15 10"></polyline>
+          </svg>
+        </div>
+        <span>AES-256 Encryption Active</span>
+      </div>
+      <div class="security-badge">Secure</div>
+    </div>
+
+    <!-- Stats Dashboard -->
+    <div id="stats-dashboard" class="stats-dashboard">
+      <div class="stat-card">
+        <div class="stat-icon">📁</div>
+        <div class="stat-value" id="stat-total">0</div>
+        <div class="stat-label">Files</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🖼️</div>
+        <div class="stat-value" id="stat-images">0</div>
+        <div class="stat-label">Images</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🎬</div>
+        <div class="stat-value" id="stat-videos">0</div>
+        <div class="stat-label">Videos</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💾</div>
+        <div class="stat-value" id="stat-size">0</div>
+        <div class="stat-label">MB Used</div>
+      </div>
+    </div>
+
+    <!-- Storage Usage -->
+    <div class="storage-bar">
+      <span id="storage-text">0 files • 0 MB used</span>
+      <div class="storage-progress">
+        <div id="storage-fill" class="storage-fill"></div>
+      </div>
+      <button id="export-all-btn" class="btn-small export-btn" title="Export All Files">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        Export All
+      </button>
+    </div>
+
+
+
+    <!-- Recently Viewed -->
+    <div id="recent-section" class="recent-section hidden">
+      <h4>📂 Recently Viewed</h4>
+      <div id="recent-scroll" class="recent-scroll"></div>
+    </div>
+
+    <!-- Bulk Actions (hidden by default) -->
+    <div id="bulk-actions" class="bulk-actions hidden">
+      <span id="selected-count">0 selected</span>
+      <button id="bulk-delete-btn" class="btn-danger">Delete Selected</button>
+      <button id="bulk-export-btn" class="btn-ghost">Export Selected</button>
+      <button id="cancel-select-btn" class="btn-ghost">Cancel</button>
+    </div>
+
+    <!-- Drag & Drop Zone (shown when dragging) -->
+    <div id="drop-zone" class="drop-zone hidden">
+      <div class="drop-zone-icon">📁</div>
+      <p>Drop files here to encrypt</p>
+    </div>
+
+    <!-- File List Container -->
+    <main id="file-list" class="file-grid">
+      <!-- Files will be injected here -->
+      <div class="empty-state">
+        <p>No secured files yet.</p>
+        <small>Tap + to secure a file</small>
+      </div>
+    </main>
+
+    <!-- Modals -->
+    <dialog id="add-modal" class="modal">
+      <div class="modal-content">
+        <h2>Secure New File</h2>
+        <input type="file" id="file-input" />
+
+        <div class="security-options">
+          <h3>Access Control</h3>
+
+          <label class="radio-card">
+            <input type="radio" name="auth-mode" value="persistent" checked>
+            <div class="card-content">
+              <strong>Persistent Access</strong>
+              <span>Password once, then auto-unlock</span>
+            </div>
+          </label>
+
+          <label class="radio-card">
+            <input type="radio" name="auth-mode" value="always">
+            <div class="card-content">
+              <strong>Always Ask</strong>
+              <span>Password required every time</span>
+            </div>
+          </label>
+
+          <label class="radio-card dest-option">
+            <input type="radio" name="auth-mode" value="view-once">
+            <div class="card-content">
+              <strong>View Once</strong>
+              <span>Self-destruct after viewing</span>
+            </div>
+          </label>
+        </div>
+
+        <!-- Auto-Delete Option -->
+        <div class="input-group">
+          <label for="expiry-date">Auto-Delete Time (Optional)</label>
+          <input type="datetime-local" id="expiry-date" class="date-input" />
+          <small class="hint">File will expire and be deleted after this exact time</small>
+        </div>
+
+        <!-- File Note -->
+        <div class="input-group">
+          <label for="file-note">Note (Optional)</label>
+          <input type="text" id="file-note" placeholder="Add a description..." maxlength="100" />
+        </div>
+
+        <div class="input-group">
+          <label for="new-password">Set Password</label>
+          <input type="password" id="new-password" placeholder="Enter secure password" />
+          <div class="password-strength">
+            <div id="strength-bar" class="strength-bar"></div>
+            <span id="strength-text" class="strength-text">Enter a password</span>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button id="cancel-add" class="btn-ghost">Cancel</button>
+          <button id="confirm-add" class="btn-primary">Encrypt & Save</button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="auth-modal" class="modal">
+      <div class="modal-content">
+        <h2>Unlock File</h2>
+        <p id="auth-file-name"></p>
+        <div class="input-group">
+          <input type="password" id="auth-password" placeholder="Enter password" />
+        </div>
+        <div class="modal-actions">
+          <button id="cancel-auth" class="btn-ghost">Cancel</button>
+          <button id="confirm-auth" class="btn-primary">Unlock</button>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- Viewer Overlay -->
+    <div id="viewer" class="viewer-overlay hidden">
+      <header class="viewer-header">
+        <button id="close-viewer" class="btn-icon" title="Close">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+        <span id="viewer-filename">filename.jpg</span>
+        <span id="viewer-timer" class="hidden">Destructing...</span>
+      </header>
+      <div id="viewer-content" class="viewer-content"></div>
+    </div>
+
+    <!-- File Info Modal -->
+    <dialog id="info-modal" class="modal">
+      <div class="modal-content">
+        <h2>📄 File Details</h2>
+        <div class="info-grid">
+          <div class="info-row"><strong>Name:</strong> <span id="info-name">-</span></div>
+          <div class="info-row"><strong>Type:</strong> <span id="info-type">-</span></div>
+          <div class="info-row"><strong>Size:</strong> <span id="info-size">-</span></div>
+          <div class="info-row"><strong>Added:</strong> <span id="info-date">-</span></div>
+          <div class="info-row"><strong>Mode:</strong> <span id="info-mode">-</span></div>
+          <div class="info-row"><strong>Expires:</strong> <span id="info-expires">Never</span></div>
+          <div class="info-row"><strong>Views:</strong> <span id="info-views">0</span></div>
+          <div class="info-row"><strong>Note:</strong> <span id="info-note">-</span></div>
+        </div>
+        <h4>📋 Access Log</h4>
+        <div id="access-log" class="access-log">No access history</div>
+        <div class="modal-actions">
+          <button id="close-info" class="btn-primary">Close</button>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- Rename Modal -->
+    <dialog id="rename-modal" class="modal">
+      <div class="modal-content">
+        <h2>✏️ Rename File</h2>
+        <div class="input-group">
+          <label for="rename-input">New Name</label>
+          <input type="text" id="rename-input" placeholder="Enter new file name" />
+        </div>
+        <div class="modal-actions">
+          <button id="cancel-rename" class="btn-ghost">Cancel</button>
+          <button id="confirm-rename" class="btn-primary">Rename</button>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- Change Password Modal -->
+    <dialog id="change-pass-modal" class="modal">
+      <div class="modal-content">
+        <h2>🔑 Change Password</h2>
+        <p id="change-pass-file"></p>
+        <div class="input-group">
+          <label>Current Password</label>
+          <input type="password" id="current-password" placeholder="Enter current password" />
+        </div>
+        <div class="input-group">
+          <label>New Password</label>
+          <input type="password" id="new-password-change" placeholder="Enter new password" />
+        </div>
+        <div class="input-group">
+          <label>Confirm New Password</label>
+          <input type="password" id="confirm-password-change" placeholder="Confirm new password" />
+        </div>
+        <div class="modal-actions">
+          <button id="cancel-change-pass" class="btn-ghost">Cancel</button>
+          <button id="confirm-change-pass" class="btn-primary">Update Password</button>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- Edit Note Modal -->
+    <dialog id="note-modal" class="modal">
+      <div class="modal-content">
+        <h2>📝 Edit Note</h2>
+        <div class="input-group">
+          <label>File Note</label>
+          <textarea id="edit-note" rows="4" placeholder="Add a note about this file..." maxlength="500"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button id="cancel-note" class="btn-ghost">Cancel</button>
+          <button id="confirm-note" class="btn-primary">Save Note</button>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- Share Modal -->
+    <dialog id="share-modal" class="modal">
+      <div class="modal-content">
+        <h2>📤 Secure Share</h2>
+        <div class="input-group">
+          <label>File Password</label>
+          <input type="password" id="share-password" placeholder="Set password for recipient">
+        </div>
+        <div class="input-group">
+          <label>Custom Title (Optional)</label>
+          <input type="text" id="share-title" placeholder="SecureVault">
+        </div>
+        <div class="input-group">
+          <label>Custom Logo (Optional)</label>
+          <input type="file" id="share-logo" accept="image/*">
+          <p class="hint">Upload your brand logo for the login screen.</p>
+        </div>
+        <div class="modal-actions">
+          <button id="cancel-share" class="btn-ghost">Cancel</button>
+          <button id="confirm-share" class="btn-primary">Export Secure File</button>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- Settings Modal -->
+    <dialog id="settings-modal" class="modal">
+      <div class="modal-content">
+        <h2>⚙️ Settings</h2>
+
+        <!-- App Lock -->
+        <div class="settings-section">
+          <h4>🔒 App Lock</h4>
+          <p class="hint">Set a password to lock the web app. Remember the password if you forget you can't reset</p>
+          <div class="input-group display-flex gap-2">
+            <input type="password" id="app-lock-password" placeholder="New App Password" />
+            <button id="set-app-lock" class="btn-small">Set</button>
+          </div>
+          <button id="remove-app-lock" class="btn-ghost" style="margin-top: 5px; width: 100%">Remove App Lock</button>
+        </div>
+
+        <!-- General Settings -->
+        <div class="settings-section">
+          <h4>🛠️ Preferences</h4>
+
+          <div class="setting-item">
+            <label>Auto-Lock Timer</label>
+            <select id="auto-lock-time">
+              <option value="60000">1 minute</option>
+              <option value="300000" selected>5 minutes</option>
+              <option value="600000">10 minutes</option>
+              <option value="1800000">30 minutes</option>
+              <option value="0">Never</option>
+            </select>
+          </div>
+
+
+        </div>
+
+        <!-- About & Support -->
+        <div class="settings-section">
+          <h4>💬 About & Support</h4>
+          <p class="hint">Have suggestions or found a bug?</p>
+          <button id="feedback-btn" class="btn-ghost" style="width:100%">Send Feedback</button>
+        </div>
+
+        <!-- Data Management -->
+        <div class="settings-section danger-zone">
+          <h4>⚠️ Data Management</h4>
+          <button id="clear-all-btn" class="btn-danger" style="width:100%">Erase All Data</button>
+          <p class="hint text-center">Permanently deletes all encrypted files</p>
+        </div>
+
+        <div class="modal-actions">
+          <button id="close-settings" class="btn-primary">Close</button>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- App Lock Screen Overlay -->
+    <div id="app-lock-screen" class="hidden">
+      <div class="lock-card">
+        <div class="lock-icon-large">🔒</div>
+        <h2>SecureVault Locked</h2>
+        <p>Please enter your access password</p>
+        <input type="password" id="lock-input" placeholder="Enter password" autofocus>
+        <button id="unlock-submit" class="btn-primary">Unlock Access</button>
+      </div>
+    </div>
+
+    <!-- Help Modal -->
+    <dialog id="help-modal" class="modal">
+      <div class="modal-content large-modal">
+        <h2>📘 User Guide</h2>
+        <div class="help-content">
+          <section>
+            <h3>📱 iPhone Users</h3>
+            <p><strong>Install a html viewer to access in iPhone</strong></p>
+            <p>To ensure the best experience (sometimes it may not work for some iOS devices) when opening exported
+              files on iOS, we recommend using a dedicated HTML viewer app.</p>
+          </section>
+
+          <section>
+            <h3>🚀 Getting Started</h3>
+            <p><strong>SecureVault</strong> is a privacy-focused file storage app. All files are encrypted on your
+              device using your password.</p>
+            <ul>
+              <li><strong>Import Files:</strong> Drag & drop files anywhere or click the "+" FAB button.</li>
+              <li><strong>Encryption:</strong> Every file receives a unique encryption key protected by your password.
+              </li>
+            </ul>
+          </section>
+
+          <section>
+            <h3>🔒 Security Modes</h3>
+            <p>Choose the right security level when adding a file:</p>
+            <ul>
+              <li><strong>Standard:</strong> Requires your password every time to open.</li>
+              <li><strong>Persistent (Device Key):</strong> Uses a device-specific key to auto-unlock on <em>this device
+                  only</em>. Great for convenience without sacrificing security on other devices.</li>
+              <li><strong>View Once:</strong> The file self-destructs immediately after it is viewed. Perfect for
+                sensitive temporary data.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h3>📤 Secure Sharing</h3>
+            <p>Share files safely with anyone, even if they don't have the app:</p>
+            <ol>
+              <li>Click the <strong>Share</strong> button on a file.</li>
+              <li><strong>Quick Share:</strong> Set a password and get a secure HTML file immediately.</li>
+              <li><strong>Custom Share:</strong> Click "Custom" to add your own <strong>Brand Title</strong> and
+                <strong>Logo</strong>.
+              </li>
+              <li>The recipient opens the HTML file in any browser, enters the password, and views the content securely.
+              </li>
+            </ol>
+            <p><em>Note: Expiry dates and View Once settings are preserved in shared files!</em></p>
+          </section>
+
+          <section>
+            <h3>⚡ Advanced Features</h3>
+            <ul>
+              <li><strong>Auto-Delete:</strong> Set an expiry date when adding a file. It will vanish automatically when
+                time is up.</li>
+              <li><strong>Decoy Mode:</strong> Set a "Decoy Password" in Settings. Entering this at login will show a
+                fake empty vault.</li>
+              <li><strong>Bulk Actions:</strong> Use the checkboxes to select multiple files for deletion or export.
+              </li>
+            </ul>
+          </section>
+
+
+        </div>
+        <div class="modal-actions">
+          <button id="close-help" class="btn-primary">Got it!</button>
+        </div>
+      </div>
+    </dialog>
+
+  </div>
+
+  <!-- Custom Prompt Modal (Mobile-Friendly) -->
+  <dialog id="custom-prompt-modal" class="modal">
+    <div class="modal-content">
+      <h2 id="prompt-title">Enter Value</h2>
+      <p id="prompt-message" class="prompt-message"></p>
+      <div class="input-group">
+        <input type="text" id="prompt-input" placeholder="Enter value..." autocomplete="off" />
+      </div>
+      <div class="modal-actions">
+        <button id="prompt-cancel" class="btn-ghost">Cancel</button>
+        <button id="prompt-confirm" class="btn-primary">Confirm</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Custom Confirm Modal (Mobile-Friendly) -->
+  <dialog id="custom-confirm-modal" class="modal">
+    <div class="modal-content">
+      <h2 id="confirm-title">Confirm</h2>
+      <p id="confirm-message" class="confirm-message"></p>
+      <div class="modal-actions">
+        <button id="confirm-cancel" class="btn-ghost">Cancel</button>
+        <button id="confirm-ok" class="btn-primary">OK</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Custom Alert Modal (Mobile-Friendly) -->
+  <dialog id="custom-alert-modal" class="modal">
+    <div class="modal-content">
+      <h2 id="alert-title">Notice</h2>
+      <p id="alert-message" class="alert-message"></p>
+      <div class="modal-actions">
+        <button id="alert-ok" class="btn-primary">OK</button>
+      </div>
+    </div>
+  </dialog>
+
+
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+
+</html>
