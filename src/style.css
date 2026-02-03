@@ -841,15 +841,15 @@ body {
   opacity: 0.7;
 }
 
-/* --- File Card --- */
+/* --- File Card (Compact Mobile UI) --- */
 .file-card {
   display: flex;
   align-items: flex-start;
-  gap: var(--space-4);
-  padding: var(--space-4);
+  gap: var(--space-2);
+  padding: var(--space-3);
   background: var(--color-bg);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-lg);
   position: relative;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -863,7 +863,7 @@ body {
   top: 0;
   left: 0;
   right: 0;
-  height: 3px;
+  height: 2px;
   background: linear-gradient(90deg, var(--gray-300), var(--gray-500), var(--gray-300));
   opacity: 0;
   transition: opacity 0.3s ease;
@@ -872,7 +872,7 @@ body {
 @keyframes cardSlideIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(8px);
   }
 
   to {
@@ -883,8 +883,8 @@ body {
 
 .file-card:hover {
   border-color: var(--gray-300);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
 }
 
 .file-card:hover::before {
@@ -892,66 +892,30 @@ body {
 }
 
 .file-card:active {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
 }
 
 .file-card .select-checkbox {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   accent-color: var(--black);
   cursor: pointer;
   flex-shrink: 0;
   border-radius: var(--radius-sm);
   transition: transform 0.2s ease;
+  margin-top: 2px;
 }
 
 .file-card .select-checkbox:hover {
   transform: scale(1.1);
 }
 
-.file-card .favorite-btn {
-  background: none;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-  padding: 0;
-  opacity: 0.4;
-  transition: all 0.2s ease;
-  position: absolute;
-  top: var(--space-3);
-  right: var(--space-3);
-}
-
-.file-card .favorite-btn:hover {
-  opacity: 0.8;
-  transform: scale(1.2);
-}
-
-.file-card .favorite-btn.active {
-  opacity: 1;
-  animation: starPop 0.3s ease;
-}
-
-@keyframes starPop {
-  0% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.4);
-  }
-
-  100% {
-    transform: scale(1);
-  }
-}
-
 .file-icon {
-  width: 52px;
-  height: 52px;
+  width: 40px;
+  height: 40px;
   background: linear-gradient(135deg, var(--color-bg-subtle), var(--color-bg-muted));
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -961,9 +925,14 @@ body {
   transition: all 0.3s ease;
 }
 
+.file-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
 .file-card:hover .file-icon {
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: scale(1.02);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .file-info {
@@ -1023,9 +992,9 @@ body {
 .file-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2);
-  margin-top: var(--space-3);
-  opacity: 0.8;
+  gap: var(--space-1);
+  margin-top: var(--space-2);
+  opacity: 0.9;
   transition: opacity 0.2s ease;
 }
 
@@ -1034,18 +1003,66 @@ body {
 }
 
 .btn-small {
-  height: 30px;
-  padding: 0 var(--space-3);
-  font-size: var(--font-size-xs);
+  height: 24px;
+  padding: 0 var(--space-2);
+  font-size: 10px;
   font-weight: 500;
   background: var(--color-bg);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
+}
+
+/* --- New File Card Layout Styles --- */
+.file-left-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  margin-right: var(--space-2);
+  flex-shrink: 0;
+}
+
+.file-primary-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.btn-highlight {
+  height: 28px;
+  padding: 0 8px;
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  width: 100%;
+  background: var(--white);
+  color: var(--black);
+  border: 2px solid var(--gray-800);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.btn-highlight:hover {
+  background: var(--gray-100);
+  border-color: var(--black);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.btn-highlight:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
 .btn-small:hover {
