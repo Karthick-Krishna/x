@@ -274,6 +274,9 @@ function setupEventListeners() {
   helpBtn?.addEventListener('click', () => helpModal?.showModal());
   document.getElementById('close-help')?.addEventListener('click', () => helpModal?.close());
 
+  // Click outside modal to close (backdrop click)
+  setupModalBackdropClose();
+
   // Settings Modal
   settingsBtn?.addEventListener('click', () => {
     loadSettings();
@@ -320,6 +323,25 @@ function setupEventListeners() {
   // window.addEventListener('blur', () => enablePrivacyCurtain());
   // window.addEventListener('focus', () => disablePrivacyCurtain());
 
+  // File Upload Zone - Show preview when file selected
+  fileInput?.addEventListener('change', handleFileSelect);
+
+  // File remove button
+  document.getElementById('file-remove-btn')?.addEventListener('click', removeSelectedFile);
+
+  // Drag over effects for upload zone
+  const uploadZone = document.getElementById('file-upload-zone');
+  uploadZone?.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadZone.classList.add('drag-over');
+  });
+  uploadZone?.addEventListener('dragleave', () => {
+    uploadZone.classList.remove('drag-over');
+  });
+  uploadZone?.addEventListener('drop', () => {
+    uploadZone.classList.remove('drag-over');
+  });
+
   // Prevent Screenshots/Context Menu
   document.addEventListener('contextmenu', e => e.preventDefault());
   document.addEventListener('keydown', e => {
@@ -337,6 +359,81 @@ function resetAddForm() {
   document.getElementById('file-note').value = '';
   strengthBar.className = 'strength-bar';
   strengthText.innerText = 'Enter a password';
+
+  // Reset file preview
+  const uploadZone = document.getElementById('file-upload-zone');
+  const filePreview = document.getElementById('file-preview');
+  uploadZone?.classList.remove('hidden');
+  filePreview?.classList.add('hidden');
+}
+
+// --- Feature: File Upload Preview ---
+function handleFileSelect() {
+  const file = fileInput.files[0];
+  if (!file) return;
+
+  const uploadZone = document.getElementById('file-upload-zone');
+  const filePreview = document.getElementById('file-preview');
+  const filePreviewName = document.getElementById('file-preview-name');
+  const filePreviewSize = document.getElementById('file-preview-size');
+
+  // Update preview info
+  filePreviewName.textContent = file.name;
+  filePreviewSize.textContent = formatFileSize(file.size);
+
+  // Show preview, hide upload zone
+  uploadZone?.classList.add('hidden');
+  filePreview?.classList.remove('hidden');
+}
+
+function removeSelectedFile(e) {
+  e.preventDefault();
+  e.stopPropagation();
+
+  fileInput.value = '';
+
+  const uploadZone = document.getElementById('file-upload-zone');
+  const filePreview = document.getElementById('file-preview');
+
+  uploadZone?.classList.remove('hidden');
+  filePreview?.classList.add('hidden');
+}
+
+function formatFileSize(bytes) {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+// --- Feature: Click Outside Modal to Close ---
+function setupModalBackdropClose() {
+  // Get all dialog modals
+  const modals = document.querySelectorAll('dialog.modal');
+
+  modals.forEach(modal => {
+    modal.addEventListener('click', (e) => {
+      // Check if click is on the dialog backdrop (not on modal-content)
+      const rect = modal.getBoundingClientRect();
+      const isInDialog = (
+        e.clientX >= rect.left &&
+        e.clientX <= rect.right &&
+        e.clientY >= rect.top &&
+        e.clientY <= rect.bottom
+      );
+
+      // If click is on the backdrop area (the dialog element itself, not its content)
+      if (e.target === modal) {
+        modal.close();
+
+        // Reset add form if it's the add modal
+        if (modal.id === 'add-modal') {
+          resetAddForm();
+        }
+      }
+    });
+  });
 }
 
 // --- Feature: Theme Toggle ---
@@ -443,13 +540,19 @@ async function handleBulkExport() {
 async function handleShareFileById(fileId) {
   const fileRecord = await DB.getFile(fileId);
   if (!fileRecord) return;
-  const decryptedBuffer = await decryptFileForExport(fileRecord);
-  if (!decryptedBuffer) return;
-  const password = await showPrompt('Set Export Password', `Enter password to protect: ${fileRecord.name}`, { inputType: 'password', placeholder: 'Enter password...' });
-  if (!password) return;
+  const result = await decryptFileForExport(fileRecord);
+  if (!result || !result.buffer) return;
+  const { buffer: decryptedBuffer, password: capturedPassword } = result;
+
+  // Prompt for the original password to use for the export only if we don't have it
+  let finalPassword = capturedPassword;
+  if (!finalPassword) {
+    finalPassword = await showPrompt('Share File', `Enter the file's password to protect this export:`, { inputType: 'password', placeholder: 'Enter original password...' });
+  }
+  if (!finalPassword) return;
 
   const exportSalt = SecureCrypto.generateSalt();
-  const exportKey = await SecureCrypto.deriveKeyFromPassword(password, exportSalt);
+  const exportKey = await SecureCrypto.deriveKeyFromPassword(finalPassword, exportSalt);
   const { iv, ciphertext } = await SecureCrypto.encryptData(exportKey, decryptedBuffer);
 
   const blobToBase64 = (blob) => new Promise((resolve) => {
@@ -965,14 +1068,20 @@ async function handleShareFile(e, fileId) {
     const fileRecord = await DB.getFile(fileId);
     if (!fileRecord) return;
 
-    const decryptedBuffer = await decryptFileForExport(fileRecord);
-    if (!decryptedBuffer) return;
+    const result = await decryptFileForExport(fileRecord);
+    if (!result || !result.buffer) return;
+    const { buffer: decryptedBuffer, password: capturedPassword } = result;
 
-    const password = await showPrompt('Share Password', 'Set a password to protect this file for sharing:', { inputType: 'password', placeholder: 'Enter password...' });
-    if (!password) return;
+    let finalPassword = capturedPassword;
+    if (!finalPassword) {
+      // If we didn't capture the password (e.g. Persistent mode used device key), we must ask for it now
+      finalPassword = await showPrompt('Share File', `Enter the file's password to protect this export:`, { inputType: 'password', placeholder: 'Enter original password...' });
+    }
+
+    if (!finalPassword) return;
 
     // Simple share without customization
-    await exportSecureFile(fileRecord, decryptedBuffer, password, {});
+    await exportSecureFile(fileRecord, decryptedBuffer, finalPassword, {});
 
   } catch (err) {
     console.error(err);
@@ -1011,8 +1120,9 @@ async function handleShareConfirm() {
     const fileRecord = await DB.getFile(currentShareFileId);
     if (!fileRecord) throw new Error('File not found');
 
-    const decryptedBuffer = await decryptFileForExport(fileRecord);
-    if (!decryptedBuffer) throw new Error('Decryption failed');
+    const result = await decryptFileForExport(fileRecord, password);
+    if (!result || !result.buffer) throw new Error('Decryption failed');
+    const decryptedBuffer = result.buffer;
 
     // Process Logo
     let logoDataUrl = "";
@@ -1323,33 +1433,56 @@ function generateSecureHTMLParts(fileMeta, salt, iv, customization = {}) {
 
 
 // Helper to decrypt strictly for export (using internal storage keys)
-async function decryptFileForExport(fileRecord) {
+async function decryptFileForExport(fileRecord, providedPassword = null) {
   // We need to unlock it first.
-  // If we are currently "logged in" or it is persistent??
-  // We can try Persistent key first.
   let fileKey = null;
+  let usedPassword = providedPassword;
 
-  if (fileRecord.authMode === 'persistent') {
+  // 1. Try provided password first if available
+  if (providedPassword) {
+    try {
+      const passKeyEntry = fileRecord.keys.find(k => k.type === 'password');
+      if (passKeyEntry) {
+        const passwordKey = await SecureCrypto.deriveKeyFromPassword(providedPassword, passKeyEntry.salt);
+        fileKey = await SecureCrypto.unwrapKey(passKeyEntry.data, passwordKey, passKeyEntry.iv);
+      }
+    } catch (e) {
+      console.log('Provided password invalid for unlock');
+      // Fall through to other methods
+    }
+  }
+
+  // 2. If no key yet, try Persistent Access (Device Key)
+  if (!fileKey && fileRecord.authMode === 'persistent') {
     const devKeyEntry = fileRecord.keys.find(k => k.type === 'device');
     if (devKeyEntry) {
       try {
         const devKey = await SecureCrypto.getDeviceKey();
         fileKey = await SecureCrypto.unwrapKey(devKeyEntry.data, devKey, devKeyEntry.iv);
+        // If successful, we don't have the password, so usedPassword remains null (unless provided was wrong but non-null)
+        if (!providedPassword) usedPassword = null;
       } catch (e) { }
     }
   }
 
+  // 3. If still no key, we MUST ask for the original password
   if (!fileKey) {
-    // If not persistent or device key failed, we MUST ask for the original password to decrypt it for export.
     const password = await showPrompt('Decrypt for Export', 'Provide the ORIGINAL password to decrypt for export:', { inputType: 'password', placeholder: 'Enter password...' });
     if (!password) return null;
 
-    const passKeyEntry = fileRecord.keys.find(k => k.type === 'password');
-    const passwordKey = await SecureCrypto.deriveKeyFromPassword(password, passKeyEntry.salt);
-    fileKey = await SecureCrypto.unwrapKey(passKeyEntry.data, passwordKey, passKeyEntry.iv);
+    try {
+      const passKeyEntry = fileRecord.keys.find(k => k.type === 'password');
+      const passwordKey = await SecureCrypto.deriveKeyFromPassword(password, passKeyEntry.salt);
+      fileKey = await SecureCrypto.unwrapKey(passKeyEntry.data, passwordKey, passKeyEntry.iv);
+      usedPassword = password; // Capture it
+    } catch (err) {
+      await showAlert('Error', 'Incorrect password');
+      return null;
+    }
   }
 
-  return await SecureCrypto.decryptData(fileKey, fileRecord.iv, fileRecord.content);
+  const buffer = await SecureCrypto.decryptData(fileKey, fileRecord.iv, fileRecord.content);
+  return { buffer, password: usedPassword };
 }
 
 
