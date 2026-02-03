@@ -782,10 +782,79 @@ body {
 .file-grid {
   flex: 1;
   padding: var(--space-4) var(--space-5);
+  padding-bottom: 100px;
+  /* Space for bottom Add File button */
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
   overflow-y: auto;
+}
+
+/* --- Bottom Add File Button --- */
+.bottom-add-btn {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  background: linear-gradient(135deg, var(--gray-900), var(--black));
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-full);
+  padding: var(--space-3) var(--space-6);
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.bottom-add-btn:hover {
+  transform: translateX(-50%) translateY(-3px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35), 0 6px 12px rgba(0, 0, 0, 0.25);
+}
+
+.bottom-add-btn:active {
+  transform: translateX(-50%) translateY(-1px);
+}
+
+.bottom-add-btn-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  position: relative;
+  z-index: 2;
+}
+
+.bottom-add-btn-content svg {
+  width: 20px;
+  height: 20px;
+}
+
+.bottom-add-btn-content span {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.bottom-add-btn .btn-shine {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  animation: btnShine 3s ease-in-out infinite;
+}
+
+@keyframes btnShine {
+  0% {
+    left: -100%;
+  }
+
+  50%,
+  100% {
+    left: 100%;
+  }
 }
 
 /* Empty State */
