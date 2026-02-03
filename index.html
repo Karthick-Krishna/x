@@ -54,14 +54,17 @@
       </div>
     </header>
 
-    <!-- Floating Add Button -->
-    <button id="add-file-btn" class="fab" aria-label="Add File">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="12" y1="5" x2="12" y2="19"></line>
-        <line x1="5" y1="12" x2="19" y2="12"></line>
-      </svg>
-      <div class="fab-ripple"></div>
+    <!-- Bottom Add File Button -->
+    <button id="add-file-btn" class="bottom-add-btn" aria-label="Add File">
+      <div class="bottom-add-btn-content">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <span>Add File</span>
+      </div>
+      <div class="btn-shine"></div>
     </button>
 
     <!-- Toolbar -->
@@ -75,29 +78,6 @@
         <option value="size-desc">Largest First</option>
         <option value="size-asc">Smallest First</option>
       </select>
-    </div>
-
-    <!-- Quick Tips (shown when no files) -->
-    <div id="quick-tips" class="quick-tips hidden">
-      <h4>🚀 Quick Start</h4>
-      <div class="tips-grid">
-        <div class="tip-card">
-          <div class="tip-icon">➕</div>
-          <span>Tap + to add files</span>
-        </div>
-        <div class="tip-card">
-          <div class="tip-icon">🔐</div>
-          <span>Files are encrypted</span>
-        </div>
-        <div class="tip-card">
-          <div class="tip-icon">📤</div>
-          <span>Share securely</span>
-        </div>
-        <div class="tip-card">
-          <div class="tip-icon">⏱️</div>
-          <span>Set auto-delete</span>
-        </div>
-      </div>
     </div>
 
     <!-- Security Status Banner -->
@@ -156,7 +136,28 @@
       </button>
     </div>
 
-
+    <!-- Quick Tips (shown when no files) -->
+    <div id="quick-tips" class="quick-tips hidden">
+      <h4>🚀 Quick Start</h4>
+      <div class="tips-grid">
+        <div class="tip-card">
+          <div class="tip-icon">➕</div>
+          <span>Tap + to add files</span>
+        </div>
+        <div class="tip-card">
+          <div class="tip-icon">🔐</div>
+          <span>Files are encrypted</span>
+        </div>
+        <div class="tip-card">
+          <div class="tip-icon">📤</div>
+          <span>Share securely</span>
+        </div>
+        <div class="tip-card">
+          <div class="tip-icon">⏱️</div>
+          <span>Set auto-delete</span>
+        </div>
+      </div>
+    </div>
 
     <!-- Recently Viewed -->
     <div id="recent-section" class="recent-section hidden">
@@ -191,7 +192,42 @@
     <dialog id="add-modal" class="modal">
       <div class="modal-content">
         <h2>Secure New File</h2>
-        <input type="file" id="file-input" />
+
+        <!-- Attractive File Upload Zone -->
+        <div class="file-upload-zone" id="file-upload-zone">
+          <input type="file" id="file-input" class="file-input-hidden" />
+          <div class="upload-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+          </div>
+          <div class="upload-text">
+            <strong>Choose a file</strong>
+            <span>or drag and drop here</span>
+          </div>
+          <div class="upload-hint">Supports all file types</div>
+        </div>
+        <div id="file-preview" class="file-preview hidden">
+          <div class="file-preview-icon">📄</div>
+          <div class="file-preview-info">
+            <span id="file-preview-name">filename.pdf</span>
+            <span id="file-preview-size">2.5 MB</span>
+          </div>
+          <button type="button" id="file-remove-btn" class="file-remove-btn">✕</button>
+        </div>
+
+        <!-- Set Password (Now below file chooser) -->
+        <div class="input-group password-section">
+          <label for="new-password">🔐 Set Password</label>
+          <input type="password" id="new-password" placeholder="Enter secure password" />
+          <div class="password-strength">
+            <div id="strength-bar" class="strength-bar"></div>
+            <span id="strength-text" class="strength-text">Enter a password</span>
+          </div>
+        </div>
 
         <div class="security-options">
           <h3>Access Control</h3>
@@ -232,15 +268,6 @@
         <div class="input-group">
           <label for="file-note">Note (Optional)</label>
           <input type="text" id="file-note" placeholder="Add a description..." maxlength="100" />
-        </div>
-
-        <div class="input-group">
-          <label for="new-password">Set Password</label>
-          <input type="password" id="new-password" placeholder="Enter secure password" />
-          <div class="password-strength">
-            <div id="strength-bar" class="strength-bar"></div>
-            <span id="strength-text" class="strength-text">Enter a password</span>
-          </div>
         </div>
 
         <div class="modal-actions">
@@ -361,8 +388,8 @@
       <div class="modal-content">
         <h2>📤 Secure Share</h2>
         <div class="input-group">
-          <label>File Password</label>
-          <input type="password" id="share-password" placeholder="Set password for recipient">
+          <label>File Password (Original)</label>
+          <input type="password" id="share-password" placeholder="Enter original file password">
         </div>
         <div class="input-group">
           <label>Custom Title (Optional)</label>
@@ -452,9 +479,9 @@
         <div class="help-content">
           <section>
             <h3>📱 iPhone Users</h3>
-            <p><strong>Install a html viewer to access in iPhone</strong></p>
-            <p>To ensure the best experience (sometimes it may not work for some iOS devices) when opening exported
-              files on iOS, we recommend using a dedicated HTML viewer app.</p>
+            <p><strong>Install an HTML viewer to access on iPhone</strong></p>
+            <p>To ensure the best experience when opening exported files on iOS, we recommend using a dedicated HTML
+              viewer app.</p>
           </section>
 
           <section>
@@ -462,7 +489,8 @@
             <p><strong>SecureVault</strong> is a privacy-focused file storage app. All files are encrypted on your
               device using your password.</p>
             <ul>
-              <li><strong>Import Files:</strong> Drag & drop files anywhere or click the "+" FAB button.</li>
+              <li><strong>Import Files:</strong> Drag & drop files anywhere or tap the <strong>"Add File"</strong>
+                button at the bottom.</li>
               <li><strong>Encryption:</strong> Every file receives a unique encryption key protected by your password.
               </li>
             </ul>
@@ -472,11 +500,12 @@
             <h3>🔒 Security Modes</h3>
             <p>Choose the right security level when adding a file:</p>
             <ul>
-              <li><strong>Standard:</strong> Requires your password every time to open.</li>
-              <li><strong>Persistent (Device Key):</strong> Uses a device-specific key to auto-unlock on <em>this device
-                  only</em>. Great for convenience without sacrificing security on other devices.</li>
-              <li><strong>View Once:</strong> The file self-destructs immediately after it is viewed. Perfect for
-                sensitive temporary data.</li>
+              <li><strong>Persistent Access:</strong> Enter password once, then auto-unlock on this device. Great for
+                convenience.</li>
+              <li><strong>Always Ask:</strong> Requires your password every time you open the file. Maximum security.
+              </li>
+              <li><strong>View Once:</strong> The file self-destructs immediately after viewing. Perfect for sensitive
+                temporary data.</li>
             </ul>
           </section>
 
@@ -485,10 +514,9 @@
             <p>Share files safely with anyone, even if they don't have the app:</p>
             <ol>
               <li>Click the <strong>Share</strong> button on a file.</li>
-              <li><strong>Quick Share:</strong> Set a password and get a secure HTML file immediately.</li>
-              <li><strong>Custom Share:</strong> Click "Custom" to add your own <strong>Brand Title</strong> and
-                <strong>Logo</strong>.
-              </li>
+              <li>Set a password to protect the file.</li>
+              <li>Optionally add a custom title and logo for branding.</li>
+              <li>Download the secure HTML file and send it to the recipient.</li>
               <li>The recipient opens the HTML file in any browser, enters the password, and views the content securely.
               </li>
             </ol>
@@ -498,15 +526,15 @@
           <section>
             <h3>⚡ Advanced Features</h3>
             <ul>
-              <li><strong>Auto-Delete:</strong> Set an expiry date when adding a file. It will vanish automatically when
-                time is up.</li>
-              <li><strong>Decoy Mode:</strong> Set a "Decoy Password" in Settings. Entering this at login will show a
-                fake empty vault.</li>
+              <li><strong>Auto-Delete:</strong> Set an expiry date/time when adding a file. It will be automatically
+                deleted when time is up.</li>
+              <li><strong>File Notes:</strong> Add descriptions to your files for easy organization.</li>
               <li><strong>Bulk Actions:</strong> Use the checkboxes to select multiple files for deletion or export.
               </li>
+              <li><strong>App Lock:</strong> Set a master password in Settings to lock the entire app.</li>
+              <li><strong>Auto-Lock Timer:</strong> Configure automatic locking after inactivity.</li>
             </ul>
           </section>
-
 
         </div>
         <div class="modal-actions">
