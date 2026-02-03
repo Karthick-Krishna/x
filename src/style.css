@@ -1091,101 +1091,106 @@ body {
   font-weight: 600;
 }
 
-/* --- FAB (Floating Action Button) --- */
-.fab {
+/* --- Bottom Add File Button --- */
+.bottom-add-btn {
   position: fixed;
-  bottom: var(--space-6);
-  right: calc(50% - 220px);
-  width: 60px;
+  bottom: var(--space-5);
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 40px);
+  max-width: 460px;
   height: 60px;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-xl);
   background: linear-gradient(135deg, var(--gray-800), var(--black));
   border: none;
   color: var(--white);
-  font-size: 24px;
+  font-size: var(--font-size-md);
+  font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 50;
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: fabEntrance 0.6s ease-out 0.3s both;
+  animation: bottomBtnEntrance 0.6s ease-out 0.3s both;
   overflow: hidden;
 }
 
-@keyframes fabEntrance {
+@keyframes bottomBtnEntrance {
   from {
     opacity: 0;
-    transform: scale(0) rotate(-180deg);
+    transform: translateX(-50%) translateY(30px);
   }
 
   to {
     opacity: 1;
-    transform: scale(1) rotate(0);
+    transform: translateX(-50%) translateY(0);
   }
 }
 
-.fab::before {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  border-radius: var(--radius-full);
-  background: linear-gradient(135deg, var(--gray-600), var(--gray-900));
-  z-index: -1;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+.bottom-add-btn-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  position: relative;
+  z-index: 2;
 }
 
-.fab:hover {
-  transform: scale(1.1) translateY(-2px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-}
-
-.fab:hover::before {
-  opacity: 1;
-}
-
-.fab:active {
-  transform: scale(0.95);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.fab svg {
+.bottom-add-btn-content svg {
   transition: transform 0.3s ease;
 }
 
-.fab:hover svg {
+.bottom-add-btn-content span {
+  letter-spacing: 0.02em;
+}
+
+.bottom-add-btn:hover {
+  transform: translateX(-50%) translateY(-3px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  background: linear-gradient(135deg, var(--gray-700), var(--gray-900));
+}
+
+.bottom-add-btn:hover .bottom-add-btn-content svg {
   transform: rotate(90deg);
 }
 
-.fab-ripple {
+.bottom-add-btn:active {
+  transform: translateX(-50%) translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.btn-shine {
   position: absolute;
-  inset: 0;
-  border-radius: var(--radius-full);
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
-  animation: fabPulse 2s ease-in-out infinite;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.15),
+      transparent);
+  animation: btnShine 3s ease-in-out infinite;
   pointer-events: none;
 }
 
-@keyframes fabPulse {
-
-  0%,
-  100% {
-    transform: scale(0.8);
-    opacity: 0;
+@keyframes btnShine {
+  0% {
+    left: -100%;
   }
 
-  50% {
-    transform: scale(1.2);
-    opacity: 0.5;
+  50%,
+  100% {
+    left: 100%;
   }
 }
 
 @media (max-width: 540px) {
-  .fab {
-    right: var(--space-5);
-    bottom: var(--space-5);
+  .bottom-add-btn {
+    width: calc(100% - 32px);
+    bottom: var(--space-4);
+    height: 56px;
   }
 }
 
@@ -1315,6 +1320,253 @@ textarea::placeholder {
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
   margin-top: var(--space-1);
+}
+
+/* --- File Upload Zone --- */
+.file-upload-zone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8) var(--space-4);
+  margin-bottom: var(--space-5);
+  border: 2px dashed var(--gray-300);
+  border-radius: var(--radius-xl);
+  background: linear-gradient(135deg, var(--gray-50), var(--white));
+  cursor: pointer;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  /* Ensure this is a positioning context */
+  z-index: 1;
+}
+
+.file-upload-zone::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: var(--radius-xl);
+  background: linear-gradient(135deg, var(--gray-400), var(--gray-600), var(--gray-400));
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.file-upload-zone:hover {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--gray-100), var(--white));
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.file-upload-zone:hover::before {
+  opacity: 1;
+}
+
+.file-upload-zone.drag-over {
+  border-color: var(--gray-600);
+  background: var(--gray-100);
+  transform: scale(1.02);
+}
+
+.file-input-hidden {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 50;
+  /* High z-index to ensure it captures clicks */
+  display: block;
+}
+
+/* ... (rest of upload zone styles are fine, just ensuring input is top) ... */
+
+.upload-icon {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--gray-800), var(--black));
+  border-radius: var(--radius-2xl);
+  color: var(--white);
+  margin-bottom: var(--space-4);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  /* Ensure icon doesn't block clicks if input is somehow below, but input is z-50 so it's fine */
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+  /* Let clicks pass through to the input */
+}
+
+.file-upload-zone:hover .upload-icon {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+}
+
+.upload-icon svg {
+  animation: uploadBounce 2s ease-in-out infinite;
+}
+
+@keyframes uploadBounce {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.upload-text {
+  text-align: center;
+  margin-bottom: var(--space-2);
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.upload-text strong {
+  display: block;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: var(--space-1);
+}
+
+.upload-text span {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.upload-hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  padding: var(--space-1) var(--space-3);
+  background: var(--gray-100);
+  border-radius: var(--radius-full);
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* --- File Preview --- */
+.file-preview {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  margin-bottom: var(--space-5);
+  background: linear-gradient(135deg, var(--green-500), #16a34a);
+  border-radius: var(--radius-lg);
+  animation: filePreviewIn 0.3s ease-out;
+}
+
+.file-preview.hidden {
+  display: none;
+}
+
+@keyframes filePreviewIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.file-preview-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-md);
+  font-size: 24px;
+}
+
+.file-preview-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.file-preview-info #file-preview-name {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--white);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-preview-info #file-preview-size {
+  font-size: var(--font-size-xs);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.file-remove-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--white);
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.file-remove-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+/* --- Password Section (Enhanced) --- */
+.password-section {
+  padding: var(--space-6);
+  background: linear-gradient(135deg, var(--gray-50), var(--gray-100));
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--gray-300);
+  margin-bottom: var(--space-6);
+  box-shadow: var(--shadow-sm);
+}
+
+.password-section label {
+  font-size: var(--font-size-lg) !important;
+  font-weight: 700 !important;
+  color: var(--gray-900);
+  margin-bottom: var(--space-3) !important;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.password-section input {
+  height: 56px;
+  font-size: var(--font-size-md);
+  border: 2px solid var(--gray-300);
+  background: var(--white);
+}
+
+.password-section input:focus {
+  border-color: var(--black);
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.1);
 }
 
 /* Radio Cards */
