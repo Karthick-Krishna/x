@@ -1832,7 +1832,15 @@ async function renderFileList(searchQuery = '') {
     el.innerHTML = `
         ${isExpired ? '<div class="expired-overlay">⏰ EXPIRED</div>' : ''}
         <input type="checkbox" class="select-checkbox" ${isSelected ? 'checked' : ''} />
-        <div class="file-icon">${icon}</div>
+        
+        <div class="file-left-col">
+           <div class="file-icon">${icon}</div>
+           <div class="file-primary-actions">
+               <button class="btn-highlight share-btn">Share</button>
+               <button class="btn-highlight custom-share-btn">Custom</button>
+           </div>
+        </div>
+
         <div class="file-info">
             <h3>${displayName}</h3>
             <div class="file-meta">
@@ -1842,10 +1850,7 @@ async function renderFileList(searchQuery = '') {
             <div class="file-actions">
                 <button class="btn-small info-btn">Info</button>
                 <button class="btn-small rename-btn">Rename</button>
-                <button class="btn-small change-pass-btn">🔑</button>
-                <button class="btn-small duplicate-btn">📋</button>
-                <button class="btn-small share-btn">Share</button>
-                <button class="btn-small custom-share-btn">Custom</button>
+                <button class="btn-small change-pass-btn">Change Password</button>
                 <button class="btn-small delete-btn">Delete</button>
             </div>
         </div>
@@ -1865,7 +1870,6 @@ async function renderFileList(searchQuery = '') {
     el.querySelector('.info-btn').onclick = (e) => showFileInfo(e, file.id);
     el.querySelector('.rename-btn').onclick = (e) => openRenameModal(e, file.id, file.name);
     el.querySelector('.change-pass-btn').onclick = (e) => openChangePasswordModal(e, file.id, file.name);
-    el.querySelector('.duplicate-btn').onclick = (e) => duplicateFile(e, file.id);
     el.querySelector('.share-btn').onclick = (e) => handleShareFile(e, file.id);
     el.querySelector('.custom-share-btn').onclick = (e) => handleCustomShare(e, file.id);
     el.querySelector('.delete-btn').onclick = (e) => handleDeleteFile(e, file.id);
