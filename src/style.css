@@ -922,7 +922,7 @@ body {
   position: relative;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  animation: cardSlideIn 0.4s ease-out both;
+  animation: cardSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
   overflow: hidden;
 }
 
@@ -1199,14 +1199,14 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: bottomBtnEntrance 0.6s ease-out 0.3s both;
+  animation: bottomBtnEntrance 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
   overflow: hidden;
 }
 
 @keyframes bottomBtnEntrance {
   from {
     opacity: 0;
-    transform: translateX(-50%) translateY(30px);
+    transform: translateX(-50%) translateY(20px);
   }
 
   to {
@@ -1297,6 +1297,17 @@ body {
 .modal::backdrop {
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(4px);
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes backdropFade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .modal-content {
@@ -1309,12 +1320,12 @@ body {
   padding: var(--space-6);
   max-height: 90vh;
   overflow-y: auto;
-  animation: slideUp var(--duration-slow) var(--ease-out);
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes slideUp {
   from {
-    transform: translateY(100%);
+    transform: translateY(30px);
     opacity: 0;
   }
 
