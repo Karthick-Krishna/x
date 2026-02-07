@@ -154,21 +154,52 @@ function showConfirm(title, message = '') {
     titleEl.textContent = title;
     messageEl.textContent = message;
 
+    let resolved = false;
+
     const cleanup = () => {
       modal.close();
       okBtn.onclick = null;
       cancelBtn.onclick = null;
+      modal.removeEventListener('click', backdropHandler);
+      modal.removeEventListener('close', closeHandler);
+    };
+
+    const backdropHandler = (event) => {
+      // If click is on the modal backdrop (not the content)
+      if (event.target === modal && !resolved) {
+        resolved = true;
+        cleanup();
+        resolve(false);
+      }
+    };
+
+    const closeHandler = () => {
+      // Handle ESC key or other close methods
+      if (!resolved) {
+        resolved = true;
+        cleanup();
+        resolve(false);
+      }
     };
 
     okBtn.onclick = () => {
-      cleanup();
-      resolve(true);
+      if (!resolved) {
+        resolved = true;
+        cleanup();
+        resolve(true);
+      }
     };
 
     cancelBtn.onclick = () => {
-      cleanup();
-      resolve(false);
+      if (!resolved) {
+        resolved = true;
+        cleanup();
+        resolve(false);
+      }
     };
+
+    modal.addEventListener('click', backdropHandler);
+    modal.addEventListener('close', closeHandler);
 
     modal.showModal();
   });
@@ -300,6 +331,24 @@ function setupEventListeners() {
 
 
 
+  // Panic Button Listeners
+  document.getElementById('panic-btn')?.addEventListener('click', triggerPanic);
+  document.getElementById('panic-action-select')?.addEventListener('change', async (e) => {
+    const newValue = e.target.value;
+    const oldValue = localStorage.getItem('sv_panic_action') || 'blur';
+
+    // Ask for confirmation
+    const confirmed = await showConfirm('Change Panic Action', `Set panic action to "${e.target.options[e.target.selectedIndex].text}"?`);
+
+    if (confirmed) {
+      localStorage.setItem('sv_panic_action', newValue);
+      await showAlert('Saved', 'Panic button action updated.');
+    } else {
+      // Revert to old value
+      e.target.value = oldValue;
+    }
+  });
+
   // Settings Toggles Removed
 
   document.getElementById('clear-all-btn')?.addEventListener('click', clearAllData);
@@ -317,6 +366,14 @@ function setupEventListeners() {
   const shareModal = document.getElementById('share-modal');
   document.getElementById('cancel-share')?.addEventListener('click', () => shareModal?.close());
   document.getElementById('confirm-share')?.addEventListener('click', handleShareConfirm);
+
+  document.getElementById('share-logo')?.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    const textEl = document.getElementById('share-logo-text');
+    if (textEl) {
+      textEl.textContent = file ? file.name : 'Choose File';
+    }
+  });
 
   // Security Monitoring (Privacy Curtain Removed as per request)
   // document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -1029,8 +1086,13 @@ async function showFileInfo(e, fileId) {
 function openRenameModal(e, fileId, currentName) {
   e.stopPropagation();
   currentRenameFileId = fileId;
-  document.getElementById('rename-input').value = currentName;
+  const input = document.getElementById('rename-input');
+  input.value = currentName;
   renameModal.showModal();
+  setTimeout(() => {
+    input.focus();
+    input.select();
+  }, 100);
 }
 
 async function handleRename() {
@@ -1887,6 +1949,11 @@ function loadSettings() {
   // Remove lock button visibility
   const removeBtn = document.getElementById('remove-app-lock');
   if (removeBtn) removeBtn.style.display = appLockPassword ? 'block' : 'none';
+
+  // Load Panic Setting
+  const savedAction = localStorage.getItem('sv_panic_action') || 'blur';
+  const panicSelect = document.getElementById('panic-action-select');
+  if (panicSelect) panicSelect.value = savedAction;
 }
 
 async function handleSetAppLock() {
@@ -1946,6 +2013,65 @@ async function checkAppLock() {
   input.onkeydown = (e) => {
     if (e.key === 'Enter') attemptUnlock();
   };
+}
+
+// --- Panic Button Feature ---
+function triggerPanic() {
+  const action = localStorage.getItem('sv_panic_action') || 'blur'; // Default is now blur
+
+  if (action === 'none') {
+    return;
+  } else if (action === 'erase') {
+    // Immediate wipe without confirmation - but preserve panic setting
+    (async () => {
+      try {
+        const panicSetting = localStorage.getItem('sv_panic_action'); // Preserve
+        const files = await DB.getAllFiles();
+        for (const file of files) await DB.deleteFile(file.id);
+        localStorage.clear();
+        if (panicSetting) localStorage.setItem('sv_panic_action', panicSetting); // Restore
+        location.reload();
+      } catch (e) { console.error(e); }
+    })();
+  } else if (action === 'lock') {
+    // Check if app lock is set
+    if (!appLockPassword) {
+      showAlert('App Lock Not Set', 'Please set an App Lock password in Settings first to use this feature.');
+      return;
+    }
+    // Reload triggers app lock on init if set
+    window.location.reload();
+  } else if (action === 'blur') {
+    const overlay = document.createElement('div');
+    overlay.className = 'panic-overlay blur-mode';
+    overlay.innerHTML = `
+           <div class="panic-message">System Error (0xCRITICAL)</div>
+           <div class="panic-message" style="font-size:16px;font-weight:400;margin-bottom:24px;">Please reload the application.</div>
+           <div class="reload-icon-btn" id="panic-reload-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                 <polyline points="23 4 23 10 17 10"></polyline>
+                 <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+              </svg>
+           </div>
+           <div class="pull-to-reload">↓ Pull down or tap icon to reload</div> 
+      `;
+    document.body.appendChild(overlay);
+
+    // Click icon to reload
+    document.getElementById('panic-reload-btn')?.addEventListener('click', () => {
+      window.location.reload();
+    });
+  } else if (action === 'loading') {
+    const overlay = document.createElement('div');
+    overlay.className = 'panic-overlay';
+    overlay.innerHTML = `<div class="fake-loading-spinner"></div><div style="color:var(--gray-500)">Loading resources...</div>
+      <div style="margin-top:20px; font-size:12px; opacity:0.5">(Touch to enter)</div>`;
+    document.body.appendChild(overlay);
+
+    const remove = () => overlay.remove();
+    overlay.addEventListener('click', remove);
+    overlay.addEventListener('touchstart', remove);
+  }
 }
 
 
