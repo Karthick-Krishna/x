@@ -30,6 +30,17 @@
       </div>
       <div class="header-actions">
         <div class="header-btn-wrapper">
+          <button id="panic-btn" class="btn-icon panic-trigger" title="Panic Mode">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+          </button>
+          <span class="btn-label" style="color:var(--red-500); font-weight:700;">PANIC</span>
+        </div>
+        <div class="header-btn-wrapper">
           <button id="help-btn" class="btn-icon" title="Help & Guide">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -397,7 +408,18 @@
         </div>
         <div class="input-group">
           <label>Custom Logo (Optional)</label>
-          <input type="file" id="share-logo" accept="image/*">
+          <div class="logo-upload-zone" id="share-logo-zone">
+            <input type="file" id="share-logo" accept="image/*" class="file-input-hidden">
+            <div class="upload-icon-small">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+            </div>
+            <span id="share-logo-text">Choose File</span>
+          </div>
           <p class="hint">Upload your brand logo for the login screen.</p>
         </div>
         <div class="modal-actions">
@@ -421,6 +443,23 @@
             <button id="set-app-lock" class="btn-small">Set</button>
           </div>
           <button id="remove-app-lock" class="btn-ghost" style="margin-top: 5px; width: 100%">Remove App Lock</button>
+        </div>
+
+        <!-- Panic Settings -->
+        <div class="settings-section">
+          <h4 style="color:var(--red-500); display:flex; align-items:center; gap:8px;">
+            🚨 Panic Button
+          </h4>
+          <p class="hint">Action to perform on panic press:</p>
+          <div class="setting-item">
+            <select id="panic-action-select" class="sort-select" style="width:100%">
+              <option value="blur" selected>Blur Screen & Reload (Default)</option>
+              <option value="loading">Fake Loading Screen</option>
+              <option value="lock">Lock Screen Immediately</option>
+              <option value="erase">❌ Erase All Data</option>
+              <option value="none">No Action</option>
+            </select>
+          </div>
         </div>
 
         <!-- General Settings -->
@@ -510,7 +549,19 @@
           </section>
 
           <section>
-            <h3>📤 Secure Sharing</h3>
+            <h3>� Panic Button (New)</h3>
+            <p>Top header <strong>red icon</strong> for instant security.</p>
+            <p>Customize behavior in Settings:</p>
+            <ul>
+              <li><strong>Blur Screen (Default):</strong> Blurs content & shows reload error. Tap icon to restore.</li>
+              <li><strong>Fake Loading:</strong> Displays fake loading spinner.</li>
+              <li><strong>Lock Screen:</strong> Instantly locks app (requires App Lock).</li>
+              <li><strong>Erase Data:</strong> ⚠️ Permanently wipes ALL data immediately!</li>
+            </ul>
+          </section>
+
+          <section>
+            <h3>�📤 Secure Sharing</h3>
             <p>Share files safely with anyone, even if they don't have the app:</p>
             <ol>
               <li>Click the <strong>Share</strong> button on a file.</li>
