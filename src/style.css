@@ -2508,3 +2508,192 @@ textarea::placeholder {
 .switch-input:checked+.switch-slider::before {
   transform: translateX(20px);
 }
+
+/* --- Excel Viewer --- */
+.excel-viewer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--white);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+.excel-header {
+  display: flex;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--gray-100);
+  border-bottom: 1px solid var(--color-border);
+  overflow-x: auto;
+}
+
+.excel-sheet-btn {
+  padding: 6px 12px;
+  border-radius: 4px;
+  background: white;
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.excel-sheet-btn:hover {
+  background: var(--gray-50);
+}
+
+.excel-sheet-btn.active {
+  background: var(--green-500);
+  color: white;
+  border-color: var(--green-500);
+}
+
+.excel-table-wrapper {
+  overflow: auto;
+  flex: 1;
+  background: white;
+}
+
+.excel-table {
+  border-collapse: collapse;
+  min-width: 100%;
+  font-size: 13px;
+  font-family: var(--font-mono);
+}
+
+.excel-table th,
+.excel-table td {
+  border: 1px solid var(--color-border);
+  padding: 8px 12px;
+  white-space: nowrap;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.excel-table th {
+  background: var(--gray-50);
+  font-weight: 600;
+  color: var(--gray-700);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 1px 0 var(--color-border);
+}
+
+.excel-table tr:nth-child(even) {
+  background: #fafafa;
+  /* Very light gray */
+}
+
+.excel-table tr:hover {
+  background: #f0fdf4;
+  /* Light green hover */
+}
+
+/* --- Word/Document Viewer --- */
+.word-viewer {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  background: #f3f4f6;
+  /* Gray background */
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.word-document {
+  width: 100%;
+  max-width: 816px;
+  /* A4 width roughly 8.5in at 96dpi */
+  min-height: 1056px;
+  /* A4 height */
+  background: white;
+  padding: 60px 72px;
+  /* 1 inch margins approx */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  color: #000;
+  font-family: 'Calibri', 'Cambria', 'Segoe UI', serif;
+  line-height: 1.5;
+  font-size: 16px;
+  /* Readable default */
+}
+
+/* Typography matching Word defaults */
+.word-document h1,
+.word-document h2,
+.word-document h3,
+.word-document h4 {
+  color: #2f5597;
+  /* Office blue */
+  margin-top: 24px;
+  margin-bottom: 8px;
+}
+
+.word-document p {
+  margin-bottom: 12px;
+  text-align: justify;
+}
+
+.word-document a {
+  color: #0563c1;
+  text-decoration: underline;
+}
+
+.word-document ul,
+.word-document ol {
+  margin-bottom: 12px;
+  padding-left: 40px;
+}
+
+.word-document table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+}
+
+.word-document td,
+.word-document th {
+  border: 1px solid #d1d5db;
+  padding: 8px 12px;
+}
+
+.word-document img {
+  max-width: 100%;
+  height: auto;
+  margin: 12px 0;
+}
+
+/* Download Hero Button */
+.download-hero-btn {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto 20px auto;
+  text-align: center;
+  background: #3b82f6;
+  color: white;
+  padding: 12px 20px;
+  font-weight: 700;
+  border-radius: 6px;
+  text-decoration: none;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+}
+
+.download-hero-btn:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  color: white;
+}
