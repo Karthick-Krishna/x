@@ -29,7 +29,7 @@
         </div>
       </div>
       <div class="header-actions">
-        <div class="header-btn-wrapper">
+        <div id="header-panic-wrapper" class="header-btn-wrapper">
           <button id="panic-btn" class="btn-icon panic-trigger" title="Panic Mode">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -450,15 +450,26 @@
           <h4 style="color:var(--red-500); display:flex; align-items:center; gap:8px;">
             🚨 Panic Button
           </h4>
-          <p class="hint">Action to perform on panic press:</p>
-          <div class="setting-item">
-            <select id="panic-action-select" class="sort-select" style="width:100%">
-              <option value="blur" selected>Blur Screen & Reload (Default)</option>
-              <option value="loading">Fake Loading Screen</option>
-              <option value="lock">Lock Screen Immediately</option>
-              <option value="erase">❌ Erase All Data</option>
-              <option value="none">No Action</option>
-            </select>
+          <div class="setting-item" style="margin-bottom: 12px; padding: 0;">
+            <label class="switch-wrapper" for="panic-enable-toggle">
+              <span class="switch-label-text">Enable Panic Button</span>
+              <div style="position:relative; display:flex; align-items:center;">
+                <input type="checkbox" id="panic-enable-toggle" class="switch-input" />
+                <span class="switch-slider"></span>
+              </div>
+            </label>
+          </div>
+          <div id="panic-settings-content">
+            <p class="hint">Action to perform on panic press:</p>
+            <div class="setting-item">
+              <select id="panic-action-select" class="sort-select" style="width:100%">
+                <option value="lock" selected>Lock Screen Immediately (Default)</option>
+                <option value="blur">Blur Screen & Reload</option>
+                <option value="loading">Fake Loading Screen</option>
+                <option value="erase">❌ Erase All Data</option>
+                <option value="none">No Action</option>
+              </select>
+            </div>
           </div>
         </div>
 
