@@ -2456,3 +2456,55 @@ textarea::placeholder {
   color: var(--gray-500);
   margin-top: var(--space-2);
 }
+
+/* --- Toggle Switch --- */
+.switch-wrapper {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  cursor: pointer;
+  padding: 8px 0;
+}
+
+.switch-label-text {
+  font-weight: 600;
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+}
+
+.switch-input {
+  display: none !important;
+}
+
+.switch-slider {
+  display: inline-block;
+  position: relative;
+  width: 44px;
+  height: 24px;
+  background-color: var(--gray-300);
+  border-radius: 9999px;
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+
+.switch-slider::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.switch-input:checked+.switch-slider {
+  background-color: var(--green-500);
+}
+
+.switch-input:checked+.switch-slider::before {
+  transform: translateX(20px);
+}
