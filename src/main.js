@@ -2,8 +2,6 @@ import './style.css';
 import { SecureCrypto } from './crypto.js';
 import { DB } from './db.js';
 import { jsPDF } from 'jspdf';
-import * as XLSX from 'xlsx';
-import * as mammoth from 'mammoth';
 
 
 // DOM Elements
@@ -362,14 +360,6 @@ function setupEventListeners() {
     }
   });
 
-  // Download Permission Toggles
-  document.getElementById('dl-media-toggle')?.addEventListener('change', (e) => {
-    localStorage.setItem('sv_dl_media', e.target.checked);
-  });
-  document.getElementById('dl-doc-toggle')?.addEventListener('change', (e) => {
-    localStorage.setItem('sv_dl_doc', e.target.checked);
-  });
-
   // Settings Toggles Removed
 
   document.getElementById('clear-all-btn')?.addEventListener('click', clearAllData);
@@ -483,97 +473,6 @@ function formatFileSize(bytes) {
   const sizes = ['Bytes', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-}
-
-// --- Feature: Excel Rendering ---
-function renderExcelToHTML(arrayBuffer, container) {
-  try {
-    const workbook = XLSX.read(new Uint8Array(arrayBuffer), { type: 'array' });
-    const sheetNames = workbook.SheetNames;
-    if (sheetNames.length === 0) return;
-
-    const viewer = document.createElement('div');
-    viewer.className = 'excel-viewer';
-
-    const header = document.createElement('div');
-    header.className = 'excel-header';
-
-    const body = document.createElement('div');
-    body.className = 'excel-table-wrapper';
-
-    let activeSheet = sheetNames[0];
-
-    const renderSheet = (name) => {
-      body.innerHTML = '';
-      const sheet = workbook.Sheets[name];
-      const data = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
-
-      if (!data || data.length === 0) {
-        body.innerHTML = '<div style="padding:20px;text-align:center;">Empty Sheet</div>';
-        return;
-      }
-
-      const table = document.createElement('table');
-      table.className = 'excel-table';
-
-      data.forEach((row, rowIndex) => {
-        const tr = document.createElement('tr');
-        row.forEach((cell) => {
-          const el = rowIndex === 0 ? 'th' : 'td';
-          const cellEl = document.createElement(el);
-          cellEl.textContent = cell !== undefined ? cell : '';
-          tr.appendChild(cellEl);
-        });
-        table.appendChild(tr);
-      });
-      body.appendChild(table);
-    };
-
-    sheetNames.forEach(name => {
-      const btn = document.createElement('button');
-      btn.className = `excel-sheet-btn ${name === activeSheet ? 'active' : ''}`;
-      btn.textContent = name;
-      btn.onclick = () => {
-        activeSheet = name;
-        renderSheet(name);
-        header.querySelectorAll('.excel-sheet-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-      };
-      header.appendChild(btn);
-    });
-
-    renderSheet(activeSheet);
-    viewer.appendChild(header);
-    viewer.appendChild(body);
-    container.appendChild(viewer);
-
-  } catch (err) {
-    console.error(err);
-    container.innerHTML = `<div style="padding:20px;color:red;">Error parsing Excel file: ${err.message}</div>`;
-  }
-}
-
-// --- Feature: Word Rendering ---
-async function renderWordToHTML(arrayBuffer, container) {
-  try {
-    const { value: html, messages } = await mammoth.convertToHtml({ arrayBuffer: arrayBuffer });
-
-    // Create viewer structure
-    const viewer = document.createElement('div');
-    viewer.className = 'word-viewer';
-
-    // Create document page
-    const doc = document.createElement('div');
-    doc.className = 'word-document';
-    doc.innerHTML = html;
-
-    viewer.appendChild(doc);
-    container.appendChild(viewer);
-
-  } catch (err) {
-    console.error(err);
-    container.innerHTML = `<div style="padding:20px;color:red;">Error parsing Word file: ${err.message}</div>`;
-  }
 }
 
 // --- Feature: Click Outside Modal to Close ---
@@ -1395,40 +1294,15 @@ function generateSecureHTMLParts(fileMeta, salt, iv, customization = {}) {
         button:active{transform:scale(0.98)}
         #error{color:#dc2626;margin-top:12px;font-size:13px;display:none}
         #status{color:#64748b;margin-top:12px;font-size:12px;min-height:1.2em}
-        #viewer{width:100%;height:100%;display:none;flex-direction:column;align-items:center;justify-content:flex-start;position:fixed;top:0;left:0;background:#ffffff;z-index:9999;padding:0;overflow-y:auto}
+        #viewer{width:100%;height:100%;display:none;flex-direction:column;align-items:center;justify-content:center;position:fixed;top:0;left:0;background:#ffffff;z-index:9999;padding:24px}
         video,audio,img{max-width:100%;max-height:80vh;border-radius:12px;box-shadow:0 20px 25px -5px rgba(0,0,0,0.1),0 8px 10px -6px rgba(0,0,0,0.1)}
         .expired-msg{color:#dc2626;font-size:24px;font-weight:700;margin-bottom:12px}
-        .viewer-top-bar{width:100%;display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:#fafafa;border-bottom:1px solid #e5e5e5;box-sizing:border-box;flex-shrink:0}
-        .close-btn{background:#f5f5f5;color:#0f172a;border:1px solid #e5e5e5;padding:10px 20px;border-radius:8px;font-weight:500;cursor:pointer;font-family:inherit;width:auto;flex-shrink:0}
+        .close-btn{position:absolute;top:20px;right:20px;background:#f5f5f5;color:#0f172a;border:1px solid #e5e5e5;padding:10px 20px;border-radius:8px;font-weight:500;cursor:pointer;font-family:inherit}
         .close-btn:hover{background:#e5e5e5}
-        .download-hero-btn{display:inline-block;background:#3b82f6;color:#fff;padding:10px 20px;border-radius:8px;font-weight:700;text-decoration:none;font-size:14px;text-transform:uppercase;letter-spacing:0.05em;cursor:pointer;font-family:inherit;flex-shrink:0;box-shadow:0 4px 6px rgba(0,0,0,0.1)}
-        .download-hero-btn:hover{background:#2563eb}
-        .viewer-content-area{width:100%;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;overflow:auto}
         .badge{display:inline-block;padding:4px 12px;background:#f5f5f5;border-radius:100px;font-size:11px;font-weight:600;color:#64748b;margin-bottom:16px;text-transform:uppercase;letter-spacing:0.02em}
         .badge.view-once{background:#fef2f2;color:#dc2626}
         .footer{margin-top:32px;font-size:11px;color:#a3a3a3}
-
-        /* Excel View Styles in Export */
-        .excel-viewer{width:100%;height:100%;display:flex;flex-direction:column;background:#fff;border-radius:8px;border:1px solid #e5e5e5;overflow:hidden}
-        .excel-header{display:flex;gap:8px;padding:8px 16px;background:#f5f5f5;border-bottom:1px solid #e5e5e5;overflow-x:auto}
-        .excel-sheet-btn{padding:6px 12px;border-radius:4px;background:#fff;border:1px solid #e5e5e5;cursor:pointer;font-size:12px;font-weight:500;white-space:nowrap}
-        .excel-sheet-btn:hover{background:#fafafa}
-        .excel-sheet-btn.active{background:#22c55e;color:#fff;border-color:#22c55e}
-        .excel-table-wrapper{overflow:auto;flex:1;background:#fff}
-        .excel-table{border-collapse:collapse;min-width:100%;font-size:13px;font-family:monospace}
-        .excel-table th, .excel-table td{border:1px solid #e5e5e5;padding:8px 12px;white-space:nowrap;max-width:300px;overflow:hidden;text-overflow:ellipsis}
-        .excel-table th{background:#fafafa;font-weight:600;color:#404040;position:sticky;top:0;z-index:10;box-shadow:0 1px 0 #e5e5e5}
-        .excel-table tr:hover{background:#f0fdf4}
-
-        /* Word View Styles in Export */
-        .word-viewer{width:100%;height:100%;overflow-y:auto;background:#f3f4f6;display:flex;justify-content:center;padding:40px 20px}
-        .word-document{width:100%;max-width:816px;min-height:1056px;background:#fff;padding:60px 72px;box-shadow:0 10px 30px rgba(0,0,0,0.1);color:#000;font-family:'Calibri',sans-serif;line-height:1.5;font-size:16px}
-        .word-document h1,.word-document h2,.word-document h3{color:#2f5597;margin-top:24px;margin-bottom:8px}
-        .word-document p{margin-bottom:12px;text-align:justify}
-        .word-document img{max-width:100%;height:auto}
     </style>
-    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.2/mammoth.browser.min.js"></script>
 </head>
 <body>
     <div id="auth" class="container">
@@ -1469,10 +1343,6 @@ function generateSecureHTMLParts(fileMeta, salt, iv, customization = {}) {
         const ID = "${fileMeta.id}";
         const MODE = "${fileMeta.authMode}";
         const EXPIRY = "${fileMeta.expiryDate || ''}";
-        
-        // injected permissions
-        const PERM_MEDIA = ${localStorage.getItem('sv_dl_media') === 'true'};
-        const PERM_DOC = ${localStorage.getItem('sv_dl_doc') === 'true'};
 
         const storagePassKey = 'sv_pass_' + ID;
         const storageViewKey = 'sv_viewed_' + ID;
@@ -1561,166 +1431,50 @@ function generateSecureHTMLParts(fileMeta, salt, iv, customization = {}) {
                 document.getElementById('auth').style.display = 'none';
                 const v = document.getElementById('viewer');
                 v.style.display = 'flex';
-                v.innerHTML = ''; // Clear previous content
-
-                // Determine Download Permission
-                const isMedia = TYPE.startsWith('image') || TYPE.startsWith('video') || TYPE.startsWith('audio');
-                const isDoc = TYPE === 'application/pdf' || TYPE.includes('word') || TYPE.includes('excel') || TYPE.includes('spreadsheet') || NAME.endsWith('.docx') || NAME.endsWith('.xlsx') || NAME.endsWith('.csv') || NAME.endsWith('.xls');
                 
-                let allowDL = false;
-                if (isMedia && PERM_MEDIA) allowDL = true;
-                if (isDoc && PERM_DOC) allowDL = true;
-
-                // Top bar with close + download
-                const topBar = document.createElement('div');
-                topBar.className = 'viewer-top-bar';
-
+                // Close button
                 const closeBtn = document.createElement('button');
-                closeBtn.innerText = '\u2715 Close';
-                closeBtn.className = 'close-btn';
+                closeBtn.innerText = "✕ Close";
+                closeBtn.className = "close-btn";
                 closeBtn.onclick = () => location.reload();
-                topBar.appendChild(closeBtn);
-
-                if (allowDL && MODE !== 'view-once') {
-                    const dlBtn = document.createElement('button');
-                    dlBtn.innerText = '\u2B07 DOWNLOAD';
-                    dlBtn.className = 'download-hero-btn';
-                    dlBtn.onclick = function() {
-                        const a = document.createElement('a');
-                        a.style.display = 'none';
-                        a.href = url;
-                        a.download = NAME;
-                        document.body.appendChild(a);
-                        a.click();
-                        setTimeout(function(){ document.body.removeChild(a); }, 200);
-                    };
-                    topBar.appendChild(dlBtn);
-                }
-
-                v.appendChild(topBar);
-
-                // Content area
-                const contentArea = document.createElement('div');
-                contentArea.className = 'viewer-content-area';
+                v.appendChild(closeBtn);
 
                 if (TYPE.startsWith('video')) {
                     const vid = document.createElement('video');
                     vid.src = url;
                     vid.controls = true;
                     vid.autoplay = true;
-                    if (!allowDL) {
-                        vid.setAttribute('controlsList', 'nodownload');
-                        vid.oncontextmenu = (e) => e.preventDefault();
-                    }
-                    contentArea.appendChild(vid);
+                    v.appendChild(vid);
                 } else if (TYPE.startsWith('audio')) {
                     const aud = document.createElement('audio');
                     aud.src = url;
                     aud.controls = true;
                     aud.autoplay = true;
-                    if (!allowDL) {
-                        aud.setAttribute('controlsList', 'nodownload');
-                        aud.oncontextmenu = (e) => e.preventDefault();
-                    }
-                    contentArea.appendChild(aud);
+                    v.appendChild(aud);
                 } else if (TYPE.startsWith('image')) {
                     const img = document.createElement('img');
                     img.src = url;
-                    contentArea.appendChild(img);
+                    v.appendChild(img);
                 } else if (TYPE === 'application/pdf' || TYPE.startsWith('text/')) {
                     const iframe = document.createElement('iframe');
-                    iframe.src = allowDL ? url : url + '#toolbar=0';
+                    iframe.src = url;
                     iframe.style.cssText = "width:100%;height:100%;border:none;background:#fff;border-radius:8px;";
-                    contentArea.appendChild(iframe);
-                } else if (
-                    TYPE === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || 
-                    TYPE === 'application/vnd.ms-excel' ||
-                    NAME.endsWith('.xlsx') || 
-                    NAME.endsWith('.xls') ||
-                    NAME.endsWith('.csv')
-                ) {
-                    // Excel Logic
-                    try {
-                        const wb = XLSX.read(new Uint8Array(decrypted), {type: 'array'});
-                        const sn = wb.SheetNames;
-                        if(sn.length > 0) {
-                             const viewer = document.createElement('div');
-                             viewer.className = 'excel-viewer';
-                             const header = document.createElement('div');
-                             header.className = 'excel-header';
-                             const body = document.createElement('div');
-                             body.className = 'excel-table-wrapper';
-                             
-                             const render = (n) => {
-                                 body.innerHTML = '';
-                                 const ws = wb.Sheets[n];
-                                 const data = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
-                                 if(!data || data.length===0){ body.innerHTML='Empty'; return; }
-                                 const tbl = document.createElement('table');
-                                 tbl.className = 'excel-table';
-                                 data.forEach((r, i) => {
-                                     const tr = document.createElement('tr');
-                                     r.forEach(c => {
-                                         const el = i===0?'th':'td';
-                                         const cell = document.createElement(el);
-                                         cell.textContent = c!==undefined?c:'';
-                                         tr.appendChild(cell);
-                                     });
-                                     tbl.appendChild(tr);
-                                 });
-                                 body.appendChild(tbl);
-                             };
-                             
-                             sn.forEach(n => {
-                                 const btn = document.createElement('button');
-                                 btn.className = 'excel-sheet-btn';
-                                 if(n===sn[0]) btn.classList.add('active');
-                                 btn.textContent = n;
-                                 btn.onclick = () => {
-                                     render(n);
-                                     header.querySelectorAll('.excel-sheet-btn').forEach(b=>b.classList.remove('active'));
-                                     btn.classList.add('active');
-                                 };
-                                 header.appendChild(btn);
-                             });
-                             
-                             render(sn[0]);
-                             viewer.appendChild(header);
-                             viewer.appendChild(body);
-                             contentArea.appendChild(viewer); 
-                        }
-                    } catch(e) { console.error(e); }
-                } else if (
-                    TYPE === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || 
-                    NAME.endsWith('.docx')
-                ) {
-                    // Word Logic
-                    try {
-                        window.mammoth.convertToHtml({arrayBuffer: decrypted})
-                            .then(result => {
-                                 const viewer = document.createElement('div');
-                                 viewer.className = 'word-viewer';
-                                 const doc = document.createElement('div');
-                                 doc.className = 'word-document';
-                                 doc.innerHTML = result.value;
-                                 viewer.appendChild(doc);
-                                 contentArea.appendChild(viewer);
-                            })
-                            .catch(err => {
-                                 const msg = document.createElement('div');
-                                 msg.innerText = "Error parsing document: " + err.message;
-                                 msg.style.color = 'red';
-                                 contentArea.appendChild(msg);
-                            });
-                    } catch(e) { console.error(e); }
+                    v.appendChild(iframe);
                 } else {
-                    const msg = document.createElement('p');
-                    msg.innerText = "Preview not supported for this file type.";
-                    msg.style.cssText = "color:#64748b;font-weight:500;margin-top:20px;";
-                    contentArea.appendChild(msg);
+                    if (MODE !== 'view-once') {
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = NAME;
+                        a.innerText = "Download File";
+                        a.style.cssText = "margin-top:20px;padding:14px 28px;background:#0f172a;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block;";
+                        v.appendChild(a);
+                    } else {
+                         const msg = document.createElement('p');
+                         msg.innerText = "Download not available in View-Once mode.";
+                         msg.style.cssText = "color:#ef4444;font-weight:500;margin-top:20px;";
+                         v.appendChild(msg);
+                    }
                 }
-
-                v.appendChild(contentArea);
                 
             } catch (e) {
                 console.error(e);
@@ -1971,33 +1725,6 @@ async function openViewer(fileRecord, fileKey) {
     const container = document.getElementById('viewer-content');
     container.innerHTML = '';
 
-    // Check Permissions
-    const allowMedia = localStorage.getItem('sv_dl_media') === 'true';
-    const allowDoc = localStorage.getItem('sv_dl_doc') === 'true';
-    const isMedia = fileRecord.type.startsWith('image') || fileRecord.type.startsWith('video') || fileRecord.type.startsWith('audio');
-    const isDoc = fileRecord.type === 'application/pdf' || fileRecord.type.includes('word') || fileRecord.type.includes('excel') || fileRecord.type.includes('spreadsheet') || fileRecord.name.endsWith('.docx') || fileRecord.name.endsWith('.xlsx') || fileRecord.name.endsWith('.xls') || fileRecord.name.endsWith('.csv');
-
-    let allowDL = false;
-    if (isMedia && allowMedia) allowDL = true;
-    if (isDoc && allowDoc) allowDL = true;
-
-    // Show Hero Download Button (below viewer header/close button, above content)
-    if (allowDL && fileRecord.authMode !== 'view-once') {
-      const dlBtn = document.createElement('button');
-      dlBtn.innerText = "\u2B07 DOWNLOAD FILE";
-      dlBtn.className = "download-hero-btn";
-      dlBtn.onclick = () => {
-        const a = document.createElement('a');
-        a.style.display = 'none';
-        a.href = currentDecryptedUrl;
-        a.download = fileRecord.name;
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(() => document.body.removeChild(a), 200);
-      };
-      container.appendChild(dlBtn);
-    }
-
     if (fileRecord.type.startsWith('image/')) {
       const img = document.createElement('img');
       img.src = currentDecryptedUrl;
@@ -2007,31 +1734,15 @@ async function openViewer(fileRecord, fileKey) {
       media.src = currentDecryptedUrl;
       media.controls = true;
       media.autoplay = true;
-      // Anti-download if not allowed
-      if (!allowDL) {
-        media.setAttribute('controlsList', 'nodownload');
-        media.oncontextmenu = (e) => e.preventDefault();
-      }
+      // Anti-download
+      media.setAttribute('controlsList', 'nodownload');
       container.appendChild(media);
     } else if (fileRecord.type === 'application/pdf') {
       const iframe = document.createElement('iframe');
-      iframe.src = currentDecryptedUrl + (allowDL ? '' : '#toolbar=0');
+      iframe.src = currentDecryptedUrl + '#toolbar=0'; // Disable toolbar
       iframe.style.width = '100%';
       iframe.style.height = '100%';
       container.appendChild(iframe);
-    } else if (
-      fileRecord.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
-      fileRecord.type === 'application/vnd.ms-excel' ||
-      fileRecord.name.endsWith('.xlsx') ||
-      fileRecord.name.endsWith('.xls') ||
-      fileRecord.name.endsWith('.csv')
-    ) {
-      renderExcelToHTML(decryptedBuffer, container);
-    } else if (
-      fileRecord.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
-      fileRecord.name.endsWith('.docx')
-    ) {
-      await renderWordToHTML(decryptedBuffer, container);
     } else {
       container.innerText = "Preview not supported for this file type.";
     }
@@ -2254,14 +1965,6 @@ function loadSettings() {
   const savedAction = localStorage.getItem('sv_panic_action') || 'lock';
   const panicSelect = document.getElementById('panic-action-select');
   if (panicSelect) panicSelect.value = savedAction;
-
-  // Load Download Permissions
-  const allowMedia = localStorage.getItem('sv_dl_media') === 'true';
-  const allowDoc = localStorage.getItem('sv_dl_doc') === 'true';
-  const mediaToggle = document.getElementById('dl-media-toggle');
-  const docToggle = document.getElementById('dl-doc-toggle');
-  if (mediaToggle) mediaToggle.checked = allowMedia;
-  if (docToggle) docToggle.checked = allowDoc;
 
   // Load Panic Enabled Toggle
   const panicEnabled = localStorage.getItem('sv_panic_enabled') === 'true'; // Default false
