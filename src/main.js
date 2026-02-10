@@ -247,6 +247,7 @@ async function init() {
   checkCrashRecovery();
   renderRecentlyViewed();
   startAutoLockTimer();
+  updatePanicVisibility(); // Initial check
 }
 
 init();
@@ -346,6 +347,16 @@ function setupEventListeners() {
     } else {
       // Revert to old value
       e.target.value = oldValue;
+    }
+  });
+
+  // Panic Enable Toggle
+  document.getElementById('panic-enable-toggle')?.addEventListener('change', (e) => {
+    const isEnabled = e.target.checked;
+    localStorage.setItem('sv_panic_enabled', isEnabled);
+    updatePanicVisibility();
+    if (isEnabled) {
+      showAlert('Panic Button Enabled', 'The panic button is now visible in the header.');
     }
   });
 
@@ -1951,9 +1962,15 @@ function loadSettings() {
   if (removeBtn) removeBtn.style.display = appLockPassword ? 'block' : 'none';
 
   // Load Panic Setting
-  const savedAction = localStorage.getItem('sv_panic_action') || 'blur';
+  const savedAction = localStorage.getItem('sv_panic_action') || 'lock';
   const panicSelect = document.getElementById('panic-action-select');
   if (panicSelect) panicSelect.value = savedAction;
+
+  // Load Panic Enabled Toggle
+  const panicEnabled = localStorage.getItem('sv_panic_enabled') === 'true'; // Default false
+  const panicToggle = document.getElementById('panic-enable-toggle');
+  if (panicToggle) panicToggle.checked = panicEnabled;
+  updatePanicVisibility();
 }
 
 async function handleSetAppLock() {
@@ -2016,8 +2033,38 @@ async function checkAppLock() {
 }
 
 // --- Panic Button Feature ---
+function updatePanicVisibility() {
+  const isEnabled = localStorage.getItem('sv_panic_enabled') === 'true';
+  const headerBtn = document.getElementById('header-panic-wrapper');
+  const settingsContent = document.getElementById('panic-settings-content');
+
+  // Show/Hide Header Button
+  if (headerBtn) {
+    if (isEnabled) {
+      headerBtn.classList.remove('hidden');
+      headerBtn.style.display = 'flex'; // Ensure flex display if using classList doesn't fully override
+    } else {
+      headerBtn.classList.add('hidden');
+      headerBtn.style.display = 'none';
+    }
+  }
+
+  // Show/Hide Settings Content
+  if (settingsContent) {
+    if (isEnabled) {
+      settingsContent.classList.remove('hidden');
+      settingsContent.style.opacity = '1';
+      settingsContent.style.pointerEvents = 'auto';
+    } else {
+      settingsContent.classList.add('hidden');
+      settingsContent.style.opacity = '0.5';
+      settingsContent.style.pointerEvents = 'none';
+    }
+  }
+}
+
 function triggerPanic() {
-  const action = localStorage.getItem('sv_panic_action') || 'blur'; // Default is now blur
+  const action = localStorage.getItem('sv_panic_action') || 'lock'; // Default is now lock
 
   if (action === 'none') {
     return;
